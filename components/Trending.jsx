@@ -32,7 +32,7 @@ const TrendingItem = ({ activeItem, item }) => {
   const videoSource =
     "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
 
-  const player = useVideoPlayer(videoSource, (player) => {
+  const player = useVideoPlayer(item.video, (player) => {
     player.loop = false;
     player.volume = 1.0;
   });
