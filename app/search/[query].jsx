@@ -9,6 +9,7 @@ import { EmptyState, SearchInput, VideoCard } from "../../components";
 
 const Search = () => {
   const { query } = useLocalSearchParams();
+  console.log(query);
   const { data: posts, refetch } = useAppwrite(() => searchPosts(query));
 
   useEffect(() => {

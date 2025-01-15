@@ -1,35 +1,83 @@
-import { useState } from "react";
-import { ResizeMode, Video } from "expo-av";
+import { useState, useEffect } from "react";
+import { useVideoPlayer, VideoView } from "expo-video";
+import { useEvent } from "expo";
 import * as Animatable from "react-native-animatable";
+import { EventEmitter } from "expo-modules-core";
 import {
   FlatList,
   Image,
   ImageBackground,
   TouchableOpacity,
+  StyleSheet,
+  View,
 } from "react-native";
 
 import { icons } from "../constants";
 
+const videoEventEmitter = new EventEmitter();
+
 const zoomIn = {
-  0: {
-    scale: 0.9,
-  },
-  1: {
-    scale: 1,
-  },
+  0: { scale: 0.9 },
+  1: { scale: 1 },
 };
 
 const zoomOut = {
-  0: {
-    scale: 1,
-  },
-  1: {
-    scale: 0.9,
-  },
+  0: { scale: 1 },
+  1: { scale: 0.9 },
 };
 
 const TrendingItem = ({ activeItem, item }) => {
   const [play, setPlay] = useState(false);
+
+  const videoSource =
+    "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4";
+
+  const player = useVideoPlayer(videoSource, (player) => {
+    player.loop = false;
+    player.volume = 1.0;
+  });
+
+  const { isPlaying } = useEvent(player, "playingChange", {
+    isPlaying: player.playing,
+  });
+
+  useEffect(() => {
+    const subscription = videoEventEmitter.addListener(
+      "videoStateChange",
+      (data) => {
+        if (data.id === item.$id && data.action === "pause") {
+          handlePause();
+        }
+      }
+    );
+
+    return () => {
+      subscription.remove();
+    };
+  }, [item.$id]);
+
+  const handlePlayPress = () => {
+    if (isPlaying) {
+      handlePause();
+    } else {
+      handlePlay();
+    }
+  };
+
+  const handlePlay = () => {
+    videoEventEmitter.emit("videoStateChange", {
+      id: item.$id,
+      action: "pause",
+    });
+
+    player.play();
+    setPlay(true);
+  };
+
+  const handlePause = () => {
+    player.pause();
+    setPlay(false);
+  };
 
   return (
     <Animatable.View
@@ -38,23 +86,19 @@ const TrendingItem = ({ activeItem, item }) => {
       duration={500}
     >
       {play ? (
-        <Video
-          source={{ uri: item.video }}
-          className="w-52 h-72 rounded-[33px] mt-3 bg-white/10"
-          resizeMode={ResizeMode.CONTAIN}
-          useNativeControls
-          shouldPlay
-          onPlaybackStatusUpdate={(status) => {
-            if (status.didJustFinish) {
-              setPlay(false);
-            }
-          }}
-        />
+        <View style={styles.videoContainer}>
+          <VideoView
+            style={styles.video}
+            player={player}
+            allowsFullscreen
+            allowsPictureInPicture
+          />
+        </View>
       ) : (
         <TouchableOpacity
           className="relative flex justify-center items-center"
           activeOpacity={0.7}
-          onPress={() => setPlay(true)}
+          onPress={handlePlayPress}
         >
           <ImageBackground
             source={{
@@ -100,5 +144,20 @@ const Trending = ({ posts }) => {
     />
   );
 };
+
+const styles = StyleSheet.create({
+  videoContainer: {
+    width: 208,
+    height: 288,
+    marginVertical: 20,
+    borderRadius: 33,
+    overflow: "hidden",
+  },
+  video: {
+    flex: 1,
+    width: "100%",
+    height: "100%",
+  },
+});
 
 export default Trending;
