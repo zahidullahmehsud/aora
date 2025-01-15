@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 
@@ -8,8 +8,9 @@ import { CustomButton, FormField } from "../../components";
 import { getCurrentUser, signIn } from "../../lib/appwrite";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
-const SignIn = () => {
-  const { setUser, setIsLogged } = useGlobalContext(null);
+export default function SignIn() {
+  const router = useRouter();
+  const { setUser, setIsLogged } = useGlobalContext();
   const [isSubmitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     email: "",
@@ -19,6 +20,7 @@ const SignIn = () => {
   const submit = async () => {
     if (form.email === "" || form.password === "") {
       Alert.alert("Error", "Please fill in all fields");
+      return;
     }
 
     setSubmitting(true);
@@ -94,6 +96,4 @@ const SignIn = () => {
       </ScrollView>
     </SafeAreaView>
   );
-};
-
-export default SignIn;
+}

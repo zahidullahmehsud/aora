@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, router } from "expo-router";
+import { Link, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { View, Text, ScrollView, Dimensions, Alert, Image } from "react-native";
 
@@ -8,7 +8,8 @@ import { createUser } from "../../lib/appwrite";
 import { CustomButton, FormField } from "../../components";
 import { useGlobalContext } from "../../context/GlobalProvider";
 
-const SignUp = () => {
+export default function SignUp() {
+  const router = useRouter();
   const { setUser, setIsLogged } = useGlobalContext();
 
   const [isSubmitting, setSubmitting] = useState(false);
@@ -21,6 +22,7 @@ const SignUp = () => {
   const submit = async () => {
     if (form.username === "" || form.email === "" || form.password === "") {
       Alert.alert("Error", "Please fill in all fields");
+      return;
     }
 
     setSubmitting(true);
@@ -100,6 +102,4 @@ const SignUp = () => {
       </ScrollView>
     </SafeAreaView>
   );
-};
-
-export default SignUp;
+}

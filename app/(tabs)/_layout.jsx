@@ -3,13 +3,12 @@ import { Redirect, Tabs } from "expo-router";
 import { Image, Text, View } from "react-native";
 
 import { icons } from "../../constants";
-// import { Loader } from "../../components";
-// import { useGlobalContext } from "../../context/GlobalProvider";
-import React from "react";
+import { Loader } from "../../components";
+import { useGlobalContext } from "../../context/GlobalProvider";
 
 const TabIcon = ({ icon, color, name, focused }) => {
   return (
-    <View className="flex items-center justify-center gap-2">
+    <View className="items-center justify-center gap-2 mt-3 w-20">
       <Image
         source={icon}
         resizeMode="contain"
@@ -27,9 +26,9 @@ const TabIcon = ({ icon, color, name, focused }) => {
 };
 
 const TabLayout = () => {
-  // const { loading, isLogged } = useGlobalContext();
+  const { loading, isLogged } = useGlobalContext();
 
-  // if (!loading && !isLogged) return <Redirect href="/sign-in" />;
+  if (!loading && !isLogged) return <Redirect href="/sign-in" />;
 
   return (
     <>
@@ -42,7 +41,7 @@ const TabLayout = () => {
             backgroundColor: "#161622",
             borderTopWidth: 1,
             borderTopColor: "#232533",
-            height: 84,
+            height: 80,
           },
         }}
       >
@@ -109,7 +108,7 @@ const TabLayout = () => {
         />
       </Tabs>
 
-      {/* <Loader isLoading={loading} /> */}
+      <Loader isLoading={loading} />
       <StatusBar backgroundColor="#161622" style="light" />
     </>
   );
